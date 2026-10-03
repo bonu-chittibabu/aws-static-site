@@ -1,0 +1,27 @@
+name: Deploy Static Website to S3
+
+on:
+  push:
+    branches:
+      - main  # Triggers the pipeline whenever code is pushed to the main branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # Step 1: Checkout code from your GitHub repository
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      # Step 2: Configure AWS Credentials using the secrets you stored in GitHub
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-south-1  # Change to your S3 bucket region if different
+
+      # Step 3: Sync local files to your Amazon S3 Bucket
+      - name: Deploy to Amazon S3
+        run: |
+          aws s3 sync . s3://YOUR-BUCKET-NAME --delete --exclude ".git/*" --exclude ".github/*"
